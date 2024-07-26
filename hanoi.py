@@ -1,6 +1,7 @@
 import streamlit as st
 import plotly.graph_objects as go
 
+# Function to print the towers' state in a textual format
 def print_towers(towers, n, move_count):
     lines = []
     lines.append(f"Move: {move_count}")
@@ -16,12 +17,14 @@ def print_towers(towers, n, move_count):
     lines.append("  A    B    C")
     return "\n".join(lines)
 
+# Function to move a disk from one tower to another
 def move_disk(towers, from_tower, to_tower, move_count):
     disk = towers[from_tower].pop()
     towers[to_tower].append(disk)
     move_count += 1
     return move_count, towers
 
+# Recursive function to solve the Tower of Hanoi problem
 def tower_of_hanoi(n, source, target, auxiliary, towers, move_count, steps):
     if n == 1:
         move_count, towers = move_disk(towers, source, target, move_count)
@@ -35,6 +38,7 @@ def tower_of_hanoi(n, source, target, auxiliary, towers, move_count, steps):
 
     return move_count, towers
 
+# Function to plot the towers' state using Plotly
 def plot_towers(towers, n, move_count):
     fig = go.Figure()
 
@@ -51,6 +55,7 @@ def plot_towers(towers, n, move_count):
             showlegend=False
         ))
 
+    # Plot the disks on the towers
     for i, tower in enumerate(towers):
         sizes = [disk * 10 for disk in tower]  # Scale the disk sizes
         positions = list(range(len(tower)))  # Position disks from bottom to top
@@ -89,21 +94,25 @@ def plot_towers(towers, n, move_count):
     )
     return fig
 
+# Streamlit interface
 st.title('Tower of Hanoi Solver')
 
+# Input to select the number of disks
 n = st.number_input("Enter the number of disks:", min_value=1, max_value=10, value=3)
 
 if st.button("Solve"):
-    towers = [list(range(n, 0, -1)), [], []]
+    towers = [list(range(n, 0, -1)), [], []]  # Initial state of the towers
     move_count = 0
     steps = []
 
     steps.append((move_count, [tower.copy() for tower in towers]))
 
+    # Solve the Tower of Hanoi problem
     move_count, towers = tower_of_hanoi(n, 0, 2, 1, towers, move_count, steps)
 
     st.write(f"Total moves: {move_count}")
 
+    # Display each move and the state of the towers
     for move, towers_state in steps:
         fig = plot_towers(towers_state, n, move)
         st.plotly_chart(fig)
